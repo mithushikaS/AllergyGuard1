@@ -22,7 +22,6 @@ export default function HelpSupportScreen() {
         text1: 'Searching',
         text2: `Searching for: ${searchQuery}`
       });
-      // In a real app, this would search help articles
     }
   };
 
@@ -49,28 +48,28 @@ export default function HelpSupportScreen() {
       <StatusBar style="light" />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={goBack}>
-          <FontAwesome name="arrow-left" size={24} color="#ffffff" />
+          <FontAwesome name="arrow-left" size={20} color="#ffffff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Help & Support</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 20 }} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Search Section */}
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
-            <FontAwesome name="search" size={20} color="#64748b" style={styles.searchIcon} />
+            <FontAwesome name="search" size={18} color="#8e8e93" style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Search help topics..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#8e8e93"
               onSubmitEditing={handleSearch}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity style={styles.clearButton} onPress={() => setSearchQuery('')}>
-                <FontAwesome name="times-circle" size={16} color="#64748b" />
+                <FontAwesome name="times-circle" size={16} color="#8e8e93" />
               </TouchableOpacity>
             )}
           </View>
@@ -116,7 +115,7 @@ export default function HelpSupportScreen() {
               multiline={true}
               numberOfLines={5}
               textAlignVertical="top"
-              placeholderTextColor="#999"
+              placeholderTextColor="#8e8e93"
             />
             <TouchableOpacity 
               style={styles.submitButton}
@@ -132,33 +131,39 @@ export default function HelpSupportScreen() {
           <Text style={styles.sectionTitle}>Other Support Options</Text>
           
           <TouchableOpacity style={styles.supportOption}>
-            <FontAwesome name="envelope" size={24} color="#4C6EF5" style={styles.supportIcon} />
+            <View style={styles.supportIconContainer}>
+              <FontAwesome name="envelope" size={18} color="#041c33ff" />
+            </View>
             <View style={styles.supportTextContainer}>
               <Text style={styles.supportTitle}>Email Support</Text>
               <Text style={styles.supportDescription}>support@allergyguard.com</Text>
             </View>
-            <FontAwesome name="chevron-right" size={16} color="#999" />
+            <FontAwesome name="chevron-right" size={14} color="#8e8e93" />
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.supportOption}>
-            <FontAwesome name="phone" size={24} color="#4C6EF5" style={styles.supportIcon} />
+            <View style={styles.supportIconContainer}>
+              <FontAwesome name="phone" size={18} color="#041c33ff" />
+            </View>
             <View style={styles.supportTextContainer}>
               <Text style={styles.supportTitle}>Call Us</Text>
               <Text style={styles.supportDescription}>+94 117 123 456</Text>
             </View>
-            <FontAwesome name="chevron-right" size={16} color="#999" />
+            <FontAwesome name="chevron-right" size={14} color="#8e8e93" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.supportOption}
             onPress={() => navigation.navigate('ExpertHelp')}
           >
-            <FontAwesome name="user-md" size={24} color="#4C6EF5" style={styles.supportIcon} />
+            <View style={styles.supportIconContainer}>
+              <FontAwesome name="user-md" size={18} color="#041c33ff" />
+            </View>
             <View style={styles.supportTextContainer}>
               <Text style={styles.supportTitle}>Expert Help</Text>
               <Text style={styles.supportDescription}>Chat with a health professional</Text>
             </View>
-            <FontAwesome name="chevron-right" size={16} color="#999" />
+            <FontAwesome name="chevron-right" size={14} color="#8e8e93" />
           </TouchableOpacity>
         </View>
 
@@ -183,7 +188,6 @@ export default function HelpSupportScreen() {
   );
 }
 
-// FAQ Item Component
 function FaqItem({ question, answer }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -191,13 +195,14 @@ function FaqItem({ question, answer }) {
     <TouchableOpacity 
       style={styles.faqItem} 
       onPress={() => setExpanded(!expanded)}
+      activeOpacity={0.7}
     >
       <View style={styles.faqHeader}>
         <Text style={styles.faqQuestion}>{question}</Text>
         <FontAwesome 
           name={expanded ? "chevron-up" : "chevron-down"} 
-          size={16} 
-          color="#4C6EF5" 
+          size={14} 
+          color="#041c33ff" 
         />
       </View>
       {expanded && (
@@ -210,74 +215,93 @@ function FaqItem({ question, answer }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f7',
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#4C6EF5',
-    paddingVertical: 15,
+    backgroundColor: '#041c33ff',
+    paddingVertical: 16,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#ffffff',
+    letterSpacing: 0.5,
   },
   backButton: {
-    padding: 5,
+    padding: 8,
   },
   content: {
     flex: 1,
+    padding: 16,
   },
   searchContainer: {
     backgroundColor: '#ffffff',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    height: 46,
     fontSize: 16,
-    color: '#0f172a',
+    color: '#041c33ff',
   },
   clearButton: {
     padding: 6,
   },
   section: {
-    padding: 20,
     backgroundColor: '#ffffff',
-    marginBottom: 15,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 15,
-    color: '#333',
+    color: '#041c33ff',
+    marginBottom: 16,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
+    color: '#8e8e93',
+    marginBottom: 16,
     lineHeight: 20,
   },
   faqItem: {
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingVertical: 15,
+    borderBottomColor: '#f1f3f5',
   },
   faqHeader: {
     flexDirection: 'row',
@@ -287,48 +311,62 @@ const styles = StyleSheet.create({
   faqQuestion: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: '#041c33ff',
     flex: 1,
     paddingRight: 10,
   },
   faqAnswer: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 10,
+    color: '#8e8e93',
+    marginTop: 12,
     lineHeight: 20,
   },
   messageContainer: {
     marginBottom: 10,
   },
   messageInput: {
-    backgroundColor: '#f5f5f7',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
-    height: 120,
-    color: '#333',
-    marginBottom: 15,
+    height: 140,
+    color: '#041c33ff',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    textAlignVertical: 'top',
   },
   submitButton: {
-    backgroundColor: '#4C6EF5',
-    borderRadius: 8,
-    paddingVertical: 14,
+    backgroundColor: '#041c33ff',
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
+    shadowColor: '#041c33ff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonText: {
-    color: 'white',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
   supportOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#f1f3f5',
   },
-  supportIcon: {
-    marginRight: 15,
+  supportIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   supportTextContainer: {
     flex: 1,
@@ -336,11 +374,11 @@ const styles = StyleSheet.create({
   supportTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: '#041c33ff',
   },
   supportDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#8e8e93',
     marginTop: 2,
   },
   appInfoContainer: {
@@ -348,16 +386,15 @@ const styles = StyleSheet.create({
   },
   appInfoText: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 15,
+    color: '#8e8e93',
+    marginBottom: 16,
   },
   linkButton: {
     paddingVertical: 10,
   },
   linkButtonText: {
     fontSize: 14,
-    color: '#4C6EF5',
+    color: '#041c33ff',
     fontWeight: '500',
   },
 });
-

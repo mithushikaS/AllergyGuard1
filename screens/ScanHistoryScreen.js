@@ -6,16 +6,14 @@ import {
   TouchableOpacity, 
   FlatList, 
   TextInput,
-  Image,
   ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-// Mock data for scan history
 const MOCK_HISTORY = [
   {
     date: '2023-06-08',
@@ -82,7 +80,6 @@ const MOCK_HISTORY = [
   }
 ];
 
-// Function to format date for display
 const formatDate = (dateString) => {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return new Date(dateString).toLocaleDateString('en-US', options);
@@ -92,19 +89,15 @@ export default function ScanHistoryScreen() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState('all'); // 'all', 'safe', 'unsafe'
+  const [filter, setFilter] = useState('all');
   const [history, setHistory] = useState(MOCK_HISTORY);
   
-  const goBack = () => {
-    navigation.goBack();
-  };
+  const goBack = () => navigation.goBack();
   
-  // Filter history based on search query and filter type
   const filteredHistory = () => {
     if (!searchQuery && filter === 'all') return history;
     
     return history.map(day => {
-      // Filter scans based on search and safety filter
       const filteredScans = day.scans.filter(scan => {
         const matchesSearch = searchQuery ? 
           scan.productName.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -118,21 +111,18 @@ export default function ScanHistoryScreen() {
         return matchesSearch && matchesFilter;
       });
       
-      // Only return days that have scans after filtering
       return filteredScans.length > 0 ? { ...day, scans: filteredScans } : null;
-    }).filter(Boolean); // Remove null entries
+    }).filter(Boolean);
   };
   
   const handleSearch = () => {
     setIsLoading(true);
-    // Simulate search delay
     setTimeout(() => {
       setIsLoading(false);
     }, 500);
   };
   
   const clearHistory = () => {
-    // Show confirmation dialog
     Toast.show({
       type: 'info',
       text1: 'Clear History',
@@ -163,32 +153,34 @@ export default function ScanHistoryScreen() {
     });
   };
   
-  // Get total number of scans
   const totalScans = history.reduce((total, day) => total + day.scans.length, 0);
   
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
+      
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={goBack}>
-          <FontAwesome name="arrow-left" size={24} color="#ffffff" />
+          <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Scan History</Text>
         <View style={{ width: 24 }} />
       </View>
 
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <FontAwesome name="search" size={20} color="#64748b" style={styles.searchIcon} />
+          <MaterialIcons name="search" size={20} color="#8e8e93" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search products..."
+            placeholderTextColor="#8e8e93"
             value={searchQuery}
             onChangeText={text => {
               setSearchQuery(text);
               handleSearch();
             }}
-            placeholderTextColor="#64748b"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity 
@@ -198,12 +190,13 @@ export default function ScanHistoryScreen() {
                 handleSearch();
               }}
             >
-              <FontAwesome name="times-circle" size={16} color="#64748b" />
+              <MaterialIcons name="close" size={16} color="#8e8e93" />
             </TouchableOpacity>
           )}
         </View>
       </View>
       
+      {/* Filter Chips */}
       <View style={styles.filterContainer}>
         <TouchableOpacity 
           style={[styles.filterChip, filter === 'all' && styles.activeFilterChip]}
@@ -218,11 +211,10 @@ export default function ScanHistoryScreen() {
           style={[styles.filterChip, filter === 'safe' && styles.safeFilterChip]}
           onPress={() => setFilter('safe')}
         >
-          <FontAwesome 
+          <MaterialIcons 
             name="check" 
-            size={12} 
-            color={filter === 'safe' ? "#ffffff" : "#10b981"} 
-            style={styles.filterIcon}
+            size={16} 
+            color={filter === 'safe' ? "white" : "#64748b"} 
           />
           <Text style={[styles.filterText, filter === 'safe' && styles.safeFilterText]}>
             Safe
@@ -233,11 +225,10 @@ export default function ScanHistoryScreen() {
           style={[styles.filterChip, filter === 'unsafe' && styles.unsafeFilterChip]}
           onPress={() => setFilter('unsafe')}
         >
-          <FontAwesome 
-            name="exclamation" 
-            size={12} 
-            color={filter === 'unsafe' ? "#ffffff" : "#ef4444"} 
-            style={styles.filterIcon}
+          <MaterialIcons 
+            name="warning" 
+            size={16} 
+            color={filter === 'unsafe' ? "white" : "#64748b"} 
           />
           <Text style={[styles.filterText, filter === 'unsafe' && styles.unsafeFilterText]}>
             Unsafe
@@ -249,15 +240,15 @@ export default function ScanHistoryScreen() {
             style={styles.clearHistoryButton}
             onPress={clearHistory}
           >
-            <FontAwesome name="trash" size={14} color="#64748b" />
-            <Text style={styles.clearHistoryText}>Clear</Text>
+            <MaterialIcons name="delete-outline" size={20} color="#64748b" />
           </TouchableOpacity>
         )}
       </View>
       
+      {/* Content */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4C6EF5" />
+          <ActivityIndicator size="large" color="#041c33ff" />
           <Text style={styles.loadingText}>Loading history...</Text>
         </View>
       ) : filteredHistory().length > 0 ? (
@@ -276,12 +267,12 @@ export default function ScanHistoryScreen() {
                   <View style={styles.scanItemLeft}>
                     <View style={[
                       styles.safetyIndicator, 
-                      { backgroundColor: scan.isSafe ? '#10b981' : '#ef4444' }
+                      { backgroundColor: scan.isSafe ? '#10B981' : '#EF4444' }
                     ]}>
-                      <FontAwesome 
-                        name={scan.isSafe ? 'check' : 'exclamation'} 
-                        size={12} 
-                        color="#ffffff" 
+                      <MaterialIcons 
+                        name={scan.isSafe ? 'check' : 'warning'} 
+                        size={16} 
+                        color="white" 
                       />
                     </View>
                     <View style={styles.productInfo}>
@@ -294,12 +285,12 @@ export default function ScanHistoryScreen() {
                               key={i} 
                               style={[
                                 styles.allergenTag,
-                                { backgroundColor: scan.isSafe ? '#dcfce7' : '#fee2e2' }
+                                { backgroundColor: scan.isSafe ? '#10B98120' : '#EF444420' }
                               ]}
                             >
                               <Text style={[
                                 styles.allergenText,
-                                { color: scan.isSafe ? '#166534' : '#b91c1c' }
+                                { color: scan.isSafe ? '#10B981' : '#EF4444' }
                               ]}>
                                 {allergen}
                               </Text>
@@ -311,7 +302,7 @@ export default function ScanHistoryScreen() {
                   </View>
                   <View style={styles.scanItemRight}>
                     <Text style={styles.scanTime}>{scan.time}</Text>
-                    <FontAwesome name="chevron-right" size={14} color="#94a3b8" />
+                    <MaterialIcons name="chevron-right" size={20} color="#64748b" />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -321,7 +312,7 @@ export default function ScanHistoryScreen() {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <FontAwesome name="history" size={50} color="#94a3b8" />
+          <MaterialIcons name="history" size={50} color="#8e8e93" />
           {history.length === 0 ? (
             <>
               <Text style={styles.emptyTitle}>No scan history</Text>
@@ -332,7 +323,7 @@ export default function ScanHistoryScreen() {
                 style={styles.scanButton}
                 onPress={() => navigation.navigate('ScanProduct')}
               >
-                <FontAwesome name="camera" size={18} color="#ffffff" />
+                <MaterialIcons name="photo-camera" size={20} color="#ffffff" />
                 <Text style={styles.scanButtonText}>Scan a Product</Text>
               </TouchableOpacity>
             </>
@@ -353,147 +344,148 @@ export default function ScanHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f7',
+    backgroundColor: '#ffffff',
   },
   header: {
-    backgroundColor: '#4C6EF5',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#041c33ff',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  backButton: {
+    marginRight: 16,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  backButton: {
-    padding: 5,
+    fontWeight: '600',
+    color: 'white',
+    flex: 1,
   },
   searchContainer: {
-    padding: 15,
+    padding: 16,
     backgroundColor: '#ffffff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f5',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    paddingHorizontal: 16,
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    height: 46,
+    height: 48,
+    color: '#041c33ff',
     fontSize: 16,
-    color: '#0f172a',
   },
   clearButton: {
     padding: 6,
   },
   filterContainer: {
     flexDirection: 'row',
-    padding: 15,
+    padding: 16,
+    alignItems: 'center',
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: '#f1f3f5',
   },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#f8f9fa',
     borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   activeFilterChip: {
-    backgroundColor: '#4C6EF5',
+    backgroundColor: '#041c33ff',
+    borderColor: '#041c33ff',
   },
   safeFilterChip: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
   },
   unsafeFilterChip: {
-    backgroundColor: '#ef4444',
-  },
-  filterIcon: {
-    marginRight: 4,
+    backgroundColor: '#EF4444',
+    borderColor: '#EF4444',
   },
   filterText: {
     fontSize: 14,
     color: '#64748b',
+    marginLeft: 4,
+    fontWeight: '500',
   },
   activeFilterText: {
-    color: '#ffffff',
-    fontWeight: '500',
+    color: 'white',
+    fontWeight: '600',
   },
   safeFilterText: {
-    color: '#ffffff',
-    fontWeight: '500',
+    color: 'white',
+    fontWeight: '600',
   },
   unsafeFilterText: {
-    color: '#ffffff',
-    fontWeight: '500',
+    color: 'white',
+    fontWeight: '600',
   },
   clearHistoryButton: {
     marginLeft: 'auto',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  clearHistoryText: {
-    marginLeft: 4,
-    fontSize: 14,
-    color: '#64748b',
+    padding: 8,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: 16,
     fontSize: 16,
-    color: '#4C6EF5',
+    color: '#041c33ff',
   },
   historyList: {
-    paddingBottom: 20,
+    paddingBottom: 16,
+    backgroundColor: '#ffffff',
   },
   dateSection: {
-    marginBottom: 20,
+    marginBottom: 16,
+    paddingHorizontal: 16,
   },
   dateHeader: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#334155',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    color: '#041c33ff',
+    marginBottom: 12,
   },
   scanItem: {
     backgroundColor: '#ffffff',
-    padding: 15,
-    marginHorizontal: 15,
-    marginBottom: 10,
+    padding: 16,
     borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#f1f3f5',
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   scanItemLeft: {
     flexDirection: 'row',
@@ -501,9 +493,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   safetyIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -513,25 +505,25 @@ const styles = StyleSheet.create({
   },
   productName: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#0f172a',
-    marginBottom: 2,
+    fontWeight: '600',
+    color: '#041c33ff',
+    marginBottom: 4,
   },
   productBrand: {
     fontSize: 14,
     color: '#64748b',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   allergensContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   allergenTag: {
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-    borderRadius: 4,
-    marginRight: 4,
-    marginBottom: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    marginRight: 8,
+    marginBottom: 8,
   },
   allergenText: {
     fontSize: 12,
@@ -544,38 +536,44 @@ const styles = StyleSheet.create({
   scanTime: {
     fontSize: 14,
     color: '#64748b',
-    marginRight: 6,
+    marginRight: 8,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
+    backgroundColor: '#ffffff',
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#334155',
-    marginTop: 15,
+    color: '#041c33ff',
+    marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
     color: '#64748b',
     textAlign: 'center',
     marginTop: 8,
+    marginBottom: 16,
   },
   scanButton: {
-    backgroundColor: '#4C6EF5',
+    backgroundColor: '#041c33ff',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 20,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    shadowColor: '#041c33ff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   scanButtonText: {
-    color: '#ffffff',
+    color: 'white',
     fontWeight: '600',
     fontSize: 16,
     marginLeft: 8,

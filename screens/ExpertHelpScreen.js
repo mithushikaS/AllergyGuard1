@@ -131,12 +131,6 @@ export default function ExpertHelpScreen() {
   useEffect(() => {
     if (!selectedExpert) return;
 
-    // Note: This query requires a composite index in Firestore
-    // Collection: chats
-    // Fields to index:
-    // - expertId (Ascending)
-    // - timestamp (Ascending)
-    // You can create this index at: https://console.firebase.google.com/v1/r/project/allergyguard-44fe9/firestore/indexes?create_composite=ClBwcm9qZWN0cy9hbGxlcmd5Z3VhcmQtNDRmZTkvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2NoYXRzL2luZGV4ZXMvXxABGgwKC
     const unsubscribe = db.collection('chats')
       .where('expertId', '==', selectedExpert.id)
       .orderBy('timestamp', 'asc')
@@ -203,40 +197,56 @@ export default function ExpertHelpScreen() {
       <StatusBar style="light" />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={goBack}>
-          <FontAwesome name="arrow-left" size={24} color="#ffffff" />
+          <FontAwesome name="arrow-left" size={20} color="#ffffff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {showChat ? `Chat with ${selectedExpert?.name}` : 'Expert Help'}
         </Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 20 }} />
       </View>
 
       {!showChat ? (
         <View style={styles.expertListContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search experts..."
-            value={query}
-            onChangeText={setQuery}
-          />
+          <View style={styles.searchContainer}>
+            <FontAwesome name="search" size={18} color="#8e8e93" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search experts..."
+              placeholderTextColor="#8e8e93"
+              value={query}
+              onChangeText={setQuery}
+            />
+          </View>
           <FlatList
             data={filteredExperts}
             keyExtractor={item => item.id}
             renderItem={renderExpertCard}
+            contentContainerStyle={styles.expertListContent}
           />
         </View>
       ) : (
         <View style={styles.chatContainer}>
+          <View style={styles.chatHeader}>
+            <TouchableOpacity onPress={() => setShowChat(false)} style={styles.backToExperts}>
+              <FontAwesome name="arrow-left" size={16} color="#041c33ff" />
+              <Text style={styles.backToExpertsText}>Back to experts</Text>
+            </TouchableOpacity>
+            <Text style={styles.chatExpertName}>{selectedExpert?.name}</Text>
+            <Text style={styles.chatExpertRole}>{selectedExpert?.role}</Text>
+          </View>
+          
           <FlatList
             data={chatHistory}
             keyExtractor={item => item.id.toString()}
             renderItem={renderChatMessage}
             contentContainerStyle={styles.chatHistory}
           />
+          
           <View style={styles.messageInputContainer}>
             <TextInput
               style={styles.messageInput}
               placeholder="Type your message..."
+              placeholderTextColor="#8e8e93"
               value={message}
               onChangeText={setMessage}
               multiline
@@ -246,7 +256,7 @@ export default function ExpertHelpScreen() {
               onPress={sendMessage}
               disabled={!message.trim()}
             >
-              <FontAwesome name="paper-plane" size={20} color="#ffffff" />
+              <FontAwesome name="paper-plane" size={18} color="#ffffff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -257,35 +267,221 @@ export default function ExpertHelpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f7' },
-  header: { backgroundColor: '#4C6EF5', padding: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  backButton: { padding: 5 },
-  searchInput: { backgroundColor: '#fff', padding: 10, margin: 15, borderRadius: 8 },
-  expertListContainer: { flex: 1 },
-  expertCard: { flexDirection: 'row', padding: 10, backgroundColor: '#fff', marginHorizontal: 10, marginVertical: 5, borderRadius: 10, alignItems: 'center' },
-  expertAvatar: { width: 60, height: 60, borderRadius: 30 },
-  expertInfo: { flex: 1, marginHorizontal: 10 },
-  expertName: { fontSize: 16, fontWeight: 'bold' },
-  expertRole: { fontSize: 14, color: '#4C6EF5' },
-  expertSpecialty: { fontSize: 12, color: '#666' },
-  expertRating: { flexDirection: 'row', alignItems: 'center' },
-  ratingText: { marginLeft: 5, fontSize: 12, color: '#999' },
-  availabilityBadge: { padding: 6, borderRadius: 10 },
-  availabilityText: { fontSize: 12 },
-  chatContainer: { flex: 1 },
-  chatHistory: { padding: 10 },
-  messageContainer: { flexDirection: 'row', marginVertical: 5 },
-  userMessage: { justifyContent: 'flex-end' },
-  expertMessage: { justifyContent: 'flex-start' },
-  messageSenderAvatar: { width: 36, height: 36, borderRadius: 18, marginRight: 8 },
-  messageBubble: { padding: 10, borderRadius: 10, maxWidth: '80%' },
-  userBubble: { backgroundColor: '#4C6EF5', alignSelf: 'flex-end' },
-  expertBubble: { backgroundColor: '#e5e7eb', alignSelf: 'flex-start' },
-  messageText: { color: '#000' },
-  messageTime: { fontSize: 10, color: '#555', marginTop: 4 },
-  messageInputContainer: { flexDirection: 'row', padding: 10, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#ddd' },
-  messageInput: { flex: 1, backgroundColor: '#f1f1f1', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 10 },
-  sendButton: { marginLeft: 10, backgroundColor: '#4C6EF5', padding: 12, borderRadius: 20 },
-  disabledSendButton: { backgroundColor: '#ccc' },
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    backgroundColor: '#041c33ff',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#ffffff',
+    letterSpacing: 0.5,
+  },
+  backButton: {
+    padding: 8,
+  },
+  expertListContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  expertListContent: {
+    paddingBottom: 16,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 48,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#041c33ff',
+  },
+  expertCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  expertAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#041c33ff',
+  },
+  expertInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  expertName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#041c33ff',
+  },
+  expertRole: {
+    fontSize: 14,
+    color: '#4C6EF5',
+    marginTop: 2,
+  },
+  expertSpecialty: {
+    fontSize: 13,
+    color: '#8e8e93',
+    marginTop: 4,
+  },
+  expertRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  ratingText: {
+    fontSize: 12,
+    color: '#8e8e93',
+    marginLeft: 4,
+  },
+  availabilityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  availabilityText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  chatContainer: {
+    flex: 1,
+  },
+  chatHeader: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f5',
+    alignItems: 'center',
+  },
+  backToExperts: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  backToExpertsText: {
+    color: '#041c33ff',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  chatExpertName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#041c33ff',
+  },
+  chatExpertRole: {
+    fontSize: 14,
+    color: '#8e8e93',
+    marginTop: 2,
+  },
+  chatHistory: {
+    padding: 16,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  userMessage: {
+    justifyContent: 'flex-end',
+  },
+  expertMessage: {
+    justifyContent: 'flex-start',
+  },
+  messageSenderAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  messageBubble: {
+    padding: 12,
+    borderRadius: 16,
+    maxWidth: '80%',
+  },
+  userBubble: {
+    backgroundColor: '#041c33ff',
+    borderBottomRightRadius: 4,
+  },
+  expertBubble: {
+    backgroundColor: '#f1f5f9',
+    borderBottomLeftRadius: 4,
+  },
+  messageText: {
+    fontSize: 15,
+    color: '#041c33ff',
+  },
+  userMessageText: {
+    color: '#ffffff',
+  },
+  messageTime: {
+    fontSize: 11,
+    color: '#8e8e93',
+    marginTop: 4,
+    textAlign: 'right',
+  },
+  messageInputContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#f1f3f5',
+  },
+  messageInput: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#041c33ff',
+    maxHeight: 100,
+  },
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#041c33ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  disabledSendButton: {
+    backgroundColor: '#e9ecef',
+  },
 });
