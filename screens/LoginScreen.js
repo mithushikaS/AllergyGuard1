@@ -209,7 +209,7 @@ const LoginScreen = () => {
                 <FontAwesome 
                   name="user" 
                   size={18} 
-                  color={userType === 'user' ? '#FFFFFF' : '#6200EE'} 
+                  color={userType === 'user' ? '#FFFFFF' : '#041c33ff'} 
                 />
                 <Text 
                   style={[
@@ -231,7 +231,7 @@ const LoginScreen = () => {
                 <FontAwesome 
                   name="user-md" 
                   size={18} 
-                  color={userType === 'expert' ? '#FFFFFF' : '#6200EE'} 
+                  color={userType === 'expert' ? '#FFFFFF' : '#041c33ff'} 
                 />
                 <Text 
                   style={[
@@ -245,7 +245,7 @@ const LoginScreen = () => {
             </View>
             
             <View style={styles.inputContainer}>
-              <FontAwesome name="envelope" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="envelope" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -258,7 +258,7 @@ const LoginScreen = () => {
             </View>
             
             <View style={styles.inputContainer}>
-              <FontAwesome name="lock" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="lock" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Password"
@@ -275,7 +275,7 @@ const LoginScreen = () => {
                 <FontAwesome
                   name={showPassword ? "eye" : "eye-slash"}
                   size={20}
-                  color="#6200EE"
+                  color="#041c33ff"
                 />
               </TouchableOpacity>
             </View>
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
-    color: '#6200EE',
+    color: '#041c33ff',
   },
   welcomeText: {
     fontSize: 28,
@@ -385,16 +385,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#6200EE',
+    borderColor: '#041c33ff',
   },
   activeUserTypeButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#041c33ff',
   },
   userTypeText: {
     marginLeft: 8,
     fontSize: 16,
     fontWeight: '500',
-    color: '#6200EE',
+    color: '#041c33ff',
   },
   activeUserTypeText: {
     color: '#FFFFFF',
@@ -412,6 +412,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+    color: '#041c33ff',
   },
   input: {
     flex: 1,
@@ -426,18 +427,18 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   forgotPasswordText: {
-    color: '#6200EE',
+    color: '#041c33ff',
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#041c33ff',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#A884E1',
+    backgroundColor: '#1a3a5a',
   },
   buttonText: {
     color: 'white',
@@ -485,7 +486,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 15,
-    color: '#6200EE',
+    color: '#041c33ff',
     fontWeight: 'bold',
   },
 });
