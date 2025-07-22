@@ -136,7 +136,7 @@ const SignupScreen = () => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={navigateToLogin}>
-              <FontAwesome name="arrow-left" size={20} color="#6200EE" />
+              <FontAwesome name="arrow-left" size={20} color="#041c33ff" />
             </TouchableOpacity>
             <Text style={styles.headerText}>Create Account</Text>
             <View style={{ width: 40 }} />
@@ -144,7 +144,7 @@ const SignupScreen = () => {
 
           <View style={styles.logoContainer}>
             <Image
-              source={require('../assets/logo.png')} // Adjust path if needed
+              source={require('../assets/logo.png')}
               style={styles.logo}
             />
             <Text style={styles.logoText}>AllergyGuard</Text>
@@ -169,7 +169,7 @@ const SignupScreen = () => {
                 <FontAwesome
                   name="user"
                   size={18}
-                  color={userType === 'user' ? '#FFFFFF' : '#6200EE'}
+                  color={userType === 'user' ? '#FFFFFF' : '#041c33ff'}
                 />
                 <Text
                   style={[
@@ -191,7 +191,7 @@ const SignupScreen = () => {
                 <FontAwesome
                   name="user-md"
                   size={18}
-                  color={userType === 'expert' ? '#FFFFFF' : '#6200EE'}
+                  color={userType === 'expert' ? '#FFFFFF' : '#041c33ff'}
                 />
                 <Text
                   style={[
@@ -205,7 +205,7 @@ const SignupScreen = () => {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome name="user" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="user" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Full Name"
@@ -216,7 +216,7 @@ const SignupScreen = () => {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome name="envelope" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="envelope" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -229,7 +229,7 @@ const SignupScreen = () => {
 
             {userType === 'expert' && (
               <View style={styles.inputContainer}>
-                <FontAwesome name="stethoscope" size={20} color="#6200EE" style={styles.icon} />
+                <FontAwesome name="stethoscope" size={20} color="#041c33ff" style={styles.icon} />
                 <TextInput
                   style={styles.input}
                   placeholder="Specialization (e.g., Allergist)"
@@ -240,7 +240,7 @@ const SignupScreen = () => {
             )}
 
             <View style={styles.inputContainer}>
-              <FontAwesome name="lock" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="lock" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Password"
@@ -255,13 +255,13 @@ const SignupScreen = () => {
                 <FontAwesome
                   name={showPassword ? 'eye' : 'eye-slash'}
                   size={20}
-                  color="#6200EE"
+                  color="#041c33ff"
                 />
               </TouchableOpacity>
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome name="lock" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="lock" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Confirm Password"
@@ -276,7 +276,7 @@ const SignupScreen = () => {
                 <FontAwesome
                   name={showConfirmPassword ? 'eye' : 'eye-slash'}
                   size={20}
-                  color="#6200EE"
+                  color="#041c33ff"
                 />
               </TouchableOpacity>
             </View>
@@ -286,7 +286,7 @@ const SignupScreen = () => {
                 <FontAwesome
                   name="info-circle"
                   size={16}
-                  color="#6200EE"
+                  color="#041c33ff"
                   style={styles.disclaimerIcon}
                 />
                 <Text style={styles.disclaimerText}>
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginTop: 8,
-    color: '#6200EE',
+    color: '#041c33ff',
   },
   welcomeText: {
     fontSize: 28,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   userTypeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#6200EE',
+    borderColor: '#041c33ff',
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
@@ -404,11 +404,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeUserTypeButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#041c33ff',
   },
   userTypeText: {
     marginLeft: 8,
-    color: '#6200EE',
+    color: '#041c33ff',
   },
   activeUserTypeText: {
     color: '#FFFFFF',
@@ -431,6 +431,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
+    color: '#041c33ff',
   },
   eyeIcon: {
     padding: 5,
@@ -443,6 +444,7 @@ const styles = StyleSheet.create({
   disclaimerIcon: {
     marginRight: 8,
     marginTop: 2,
+    color: '#041c33ff',
   },
   disclaimerText: {
     fontSize: 12,
@@ -450,7 +452,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   button: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#041c33ff',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -502,7 +504,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   loginText: {
-    color: '#6200EE',
+    color: '#041c33ff',
     fontWeight: 'bold',
   },
 });
