@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -9,12 +9,12 @@ import { AuthContext } from '../contexts/AuthContext';
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const { userRole, logout } = useContext(AuthContext);
+  const { userRole, logout, user } = useContext(AuthContext);
   const isExpert = userRole === 'expert';
   
-  // Regular user state
-  const [name, setName] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('');
+  // Regular user state with initial values from user context
+  const [name, setName] = useState(user?.name || '');
+  const [emergencyContact, setEmergencyContact] = useState(user?.emergencyContact || '');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [languagePreference, setLanguagePreference] = useState('English');
 
@@ -27,11 +27,21 @@ export default function ProfileScreen() {
   const languages = ['English', 'Sinhala', 'Tamil'];
   const specializations = ['Allergist', 'Nutritionist', 'Dermatologist', 'Immunologist', 'Pharmacist'];
   
+  // Set initial values when component mounts
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmergencyContact(user.emergencyContact || '');
+      // Set other user-specific fields as needed
+    }
+  }, [user]);
+
   const goBack = () => {
     navigation.goBack();
   };
 
   const saveProfile = () => {
+    // Here you would typically save to your backend/database
     Toast.show({
       type: 'success',
       text1: 'Success',
@@ -175,25 +185,6 @@ export default function ProfileScreen() {
                   trackColor={{ false: "#767577", true: "#0a84ff" }}
                   thumbColor="#fff"
                 />
-              </View>
-            </View>
-
-            {/* Performance Metrics */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Performance</Text>
-              <View style={styles.metricsContainer}>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>98%</Text>
-                  <Text style={styles.metricLabel}>Response Rate</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>4.9</Text>
-                  <Text style={styles.metricLabel}>Rating</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>152</Text>
-                  <Text style={styles.metricLabel}>Consultations</Text>
-                </View>
               </View>
             </View>
           </>
@@ -441,7 +432,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     fontSize: 16,
-    color: '#041c33ff',
+    color: '#041c33ff', // Changed to blue color
     borderWidth: 1,
     borderColor: '#e9ecef',
   },

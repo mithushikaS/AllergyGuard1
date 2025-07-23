@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
   },
   userBubble: {
-    backgroundColor: '#041c33ff',
+    backgroundColor: '#d2dfebff',
     borderBottomRightRadius: 4,
   },
   expertBubble: {

@@ -85,14 +85,14 @@ const ForgotPasswordScreen = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <TouchableOpacity style={styles.backButton} onPress={navigateToLogin}>
-            <FontAwesome name="arrow-left" size={22} color="#6200EE" />
+            <FontAwesome name="arrow-left" size={22} color="#041c33ff" />
           </TouchableOpacity>
 
           <View style={styles.logoContainer}>
             <Image
-              source={{ uri: 'https://api.a0.dev/assets/image?text=AllergySafe+Logo&aspect=1:1' }}
-              style={styles.logo}
-            />
+                          source={require('../assets/logo.png')}
+                          style={styles.logo}
+                        />
             <Text style={styles.logoText}>AllergyGuard</Text>
           </View>
 
@@ -103,7 +103,7 @@ const ForgotPasswordScreen = () => {
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <FontAwesome name="envelope" size={20} color="#6200EE" style={styles.icon} />
+              <FontAwesome name="envelope" size={20} color="#041c33ff" style={styles.icon} />
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
-    color: '#6200EE',
+    color: '#041c33ff',
   },
   titleText: {
     fontSize: 28,
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#041c33ff',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 20,
-    shadowColor: '#6200EE',
+    shadowColor: '#041c33ff',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#A884E1',
+    backgroundColor: '#2c3e50',
   },
   buttonText: {
     color: 'white',
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 15,
-    color: '#6200EE',
+    color: '#041c33ff',
     fontWeight: 'bold',
   },
   successContainer: {
