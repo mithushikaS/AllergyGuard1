@@ -33,10 +33,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
+          <StatusBar style="light" />
       
       {/* Header */}
       <View style={styles.header}>
+        <Text style={styles.greeting}></Text>
         <View style={styles.headerContent}>
           <Text style={styles.logo}>AllergyGuard</Text>
           <TouchableOpacity onPress={() => logout()} style={styles.iconButton}>
@@ -70,6 +71,7 @@ export default function HomeScreen() {
         {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.greeting}></Text>
           <View style={styles.actionTiles}>
             {isExpert ? (
               <>
@@ -719,10 +721,10 @@ const styles = StyleSheet.create({
 bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: COLORS.primary, // Blue background
+    backgroundColor: COLORS.primary, 
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)', // Subtle top border
+    borderTopColor: 'rgba(255,255,255,0.1)', 
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -737,25 +739,25 @@ navItem: {
     alignItems: 'center',
     padding: 8,
     borderRadius: 8,
-    width: '25%', // Ensure equal spacing
+    width: '25%', 
 },
 navItemActive: {
-    backgroundColor: 'rgba(255,255,255,0.15)', // Slightly lighter blue for active
+    backgroundColor: 'rgba(255,255,255,0.15)', 
 },
 navIcon: {
     marginBottom: 4,
 },
 navIconActive: {
-    // No additional styles needed since we're using white icons
+    
 },
 navLabel: {
     fontSize: 12,
-    color: COLORS.white, // White text
-    opacity: 0.8, // Slightly muted when inactive
+    color: COLORS.white, 
+    opacity: 0.8, 
 },
 navLabelActive: {
     color: COLORS.white,
     fontWeight: '600',
-    opacity: 1, // Full white when active
+    opacity: 1, 
 },
 });
