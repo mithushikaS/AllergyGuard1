@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import Toast from 'react-native-toast-message';
@@ -47,6 +46,10 @@ export default function ScanProductScreen() {
       }
     })();
   }, []);
+
+  const goBack = () => {
+    navigation.goBack();
+  };
 
   if (!permission) {
     return (
@@ -88,26 +91,23 @@ export default function ScanProductScreen() {
   }
 
   const takePicture = async () => {
-    const photo = await ref.current?.takePictureAsync();
-    setUri(photo?.uri);
-    setScanning(true);
     try {
-      setTimeout(() => {
-        setImageCaptured('https://api.a0.dev/assets/image?text=Product+Label&aspect=4:3');
-        setScanning(false);
+      const photo = await ref.current?.takePictureAsync();
+      if (photo?.uri) {
+        setUri(photo.uri);
+        setImageCaptured(photo.uri); // Set the actual captured image
+        setScanning(true);
+        
         setTimeout(() => {
-          analyzeImage();
-        }, 500);
-      }, 1000);
+          setScanning(false);
+          analyzeImage(photo.uri);
+        }, 1000);
+      }
     } catch (error) {
       console.error('Error taking picture:', error);
       showErrorToast('Failed to capture image');
       setScanning(false);
     }
-  };
-
-  const goBack = () => {
-    navigation.goBack();
   };
 
   const showErrorToast = (message) => {
@@ -122,7 +122,7 @@ export default function ScanProductScreen() {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['Cancel', 'Take Photo', 'Choose from Library', 'Upload File'],
+          options: ['Cancel', 'Take Photo', 'Choose from Library', 'Upload File', 'Use Sample Image'],
           cancelButtonIndex: 0,
           userInterfaceStyle: 'dark',
         },
@@ -136,6 +136,9 @@ export default function ScanProductScreen() {
               break;
             case 3:
               pickDocument();
+              break;
+            case 4:
+              useSampleImage();
               break;
           }
         }
@@ -158,19 +161,13 @@ export default function ScanProductScreen() {
         exif: false,
       });
 
-      if (!result.canceled) {
+      if (!result.canceled && result.assets[0].uri) {
         const fileUri = result.assets[0].uri;
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        
-        if (fileInfo.exists) {
-          setImageCaptured(fileUri);
-          setScanning(false);
-          setTimeout(() => {
-            analyzeImage();
-          }, 500);
-        } else {
-          throw new Error('File not found');
-        }
+        setImageCaptured(fileUri);
+        setScanning(false);
+        setTimeout(() => {
+          analyzeImage(fileUri);
+        }, 500);
       } else {
         setScanning(false);
       }
@@ -191,19 +188,13 @@ export default function ScanProductScreen() {
         copyToCacheDirectory: true,
       });
 
-      if (result.type === 'success') {
+      if (result.type === 'success' && result.uri) {
         const fileUri = result.uri;
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        
-        if (fileInfo.exists) {
-          setImageCaptured(fileUri);
-          setScanning(false);
-          setTimeout(() => {
-            analyzeImage();
-          }, 500);
-        } else {
-          throw new Error('File not found');
-        }
+        setImageCaptured(fileUri);
+        setScanning(false);
+        setTimeout(() => {
+          analyzeImage(fileUri);
+        }, 500);
       } else {
         setScanning(false);
       }
@@ -219,12 +210,12 @@ export default function ScanProductScreen() {
     setScanning(true);
     
     try {
+      const sampleImageUri = 'https://api.a0.dev/assets/image?text=Food+Product+Label&aspect=4:3';
+      setImageCaptured(sampleImageUri);
+      
       setTimeout(() => {
-        setImageCaptured('https://api.a0.dev/assets/image?text=Food+Product+Label&aspect=4:3');
         setScanning(false);
-        setTimeout(() => {
-          analyzeImage();
-        }, 500);
+        analyzeImage(sampleImageUri);
       }, 1000);
     } catch (error) {
       console.error('Error using sample image:', error);
@@ -233,25 +224,37 @@ export default function ScanProductScreen() {
     }
   };
 
-  const analyzeImage = () => {
+  const analyzeImage = (imageUri) => {
     setScanning(true);
+    
+    console.log('Analyzing image with URI:', imageUri); // Debug log
+    
     Toast.show({
       type: 'info',
       text1: 'Analyzing ingredients...',
       position: 'bottom'
     });
 
+    // Simulate API call/analysis
     setTimeout(() => {
       setScanning(false);
+      
+      // Navigate to result screen with the actual image URI
       navigation.navigate('ProductResult', {
         productName: 'Chocolate Chip Cookies',
+        brand: 'Sweet Delights',
         ingredients: [
-          'Wheat Flour', 'Sugar', 'Chocolate Chips (Cocoa Mass, Sugar, Cocoa Butter, Emulsifier: Soy Lecithin)',
-          'Vegetable Oil (Palm, Rapeseed)', 'Eggs', 'Salt', 'Raising Agent (Sodium Bicarbonate)'
+          'Wheat Flour', 
+          'Sugar', 
+          'Chocolate Chips (Cocoa Mass, Sugar, Cocoa Butter, Emulsifier: Soy Lecithin)',
+          'Vegetable Oil (Palm, Rapeseed)', 
+          'Eggs', 
+          'Salt', 
+          'Raising Agent (Sodium Bicarbonate)'
         ],
         allergensFound: ['Wheat (Gluten)', 'Eggs', 'Soy'],
         isSafe: false,
-        image: imageCaptured
+        image: imageUri // Pass the actual image URI
       });
     }, 2000);
   };
@@ -277,13 +280,20 @@ export default function ScanProductScreen() {
 
   const renderPicture = () => {
     return (
-      <View>
+      <View style={styles.previewContainer}>
         <Image
           source={{ uri }}
           contentFit="contain"
-          style={{ width: 300, aspectRatio: 1 }}
+          style={styles.previewImage}
         />
-        <Button onPress={() => setUri(null)} title="Take another picture" />
+        <View style={styles.previewButtons}>
+          <TouchableOpacity style={styles.retryButton} onPress={() => setUri(null)}>
+            <Text style={styles.retryButtonText}>Retake Photo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.analyzeButton} onPress={() => analyzeImage(uri)}>
+            <Text style={styles.analyzeButtonText}>Analyze This Image</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -314,13 +324,14 @@ export default function ScanProductScreen() {
         </View>
         
         <View style={styles.shutterContainer}>
-          <Pressable onPress={toggleMode}>
+          <Pressable onPress={toggleMode} style={styles.modeButton}>
             {mode === "picture" ? (
               <AntDesign name="picture" size={32} color="white" />
             ) : (
               <Feather name="video" size={32} color="white" />
             )}
           </Pressable>
+          
           <Pressable onPress={mode === "picture" ? takePicture : recordVideo}>
             {({ pressed }) => (
               <View
@@ -342,7 +353,8 @@ export default function ScanProductScreen() {
               </View>
             )}
           </Pressable>
-          <Pressable onPress={toggleFacing}>
+          
+          <Pressable onPress={toggleFacing} style={styles.flipButton}>
             <FontAwesome6 name="rotate-left" size={32} color="white" />
           </Pressable>
         </View>
@@ -355,7 +367,7 @@ export default function ScanProductScreen() {
       {scanning && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#ffffff" />
-          <Text style={styles.loadingText}>Scanning...</Text>
+          <Text style={styles.loadingText}>Scanning Product...</Text>
         </View>
       )}
       
@@ -457,6 +469,12 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 50,
   },
+  modeButton: {
+    padding: 10,
+  },
+  flipButton: {
+    padding: 10,
+  },
   controlsContainer: {
     position: 'absolute',
     top: 50,
@@ -465,6 +483,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    zIndex: 10,
   },
   backButton: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -487,6 +506,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 16,
     fontSize: 18,
+    fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
@@ -519,6 +539,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontSize: 16,
     color: '#1E3A8A',
+    fontWeight: '500',
   },
   cancelButton: {
     marginTop: 20,
@@ -550,6 +571,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     textAlign: 'center',
     marginBottom: 30,
+    lineHeight: 22,
   },
   permissionButton: {
     backgroundColor: '#1E3A8A',
@@ -561,5 +583,45 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  previewContainer: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#041c33',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  previewImage: {
+    width: '100%',
+    height: 300,
+    borderRadius: 12,
+    marginBottom: 30,
+  },
+  previewButtons: {
+    width: '100%',
+    gap: 15,
+  },
+  retryButton: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  analyzeButton: {
+    backgroundColor: '#10B981',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  analyzeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

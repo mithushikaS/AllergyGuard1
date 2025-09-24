@@ -19,6 +19,9 @@ export default function ProductResultScreen() {
   } = route.params || {};
   
   const [showAllIngredients, setShowAllIngredients] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  console.log('Received image URI:', image); // Debug log
 
   const goBack = () => {
     navigation.goBack();
@@ -34,6 +37,14 @@ export default function ProductResultScreen() {
 
   const contactExpert = () => {
     navigation.navigate('ExpertHelp');
+  };
+
+  const findAlternatives = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Coming Soon',
+      text2: 'Alternative products feature coming soon'
+    });
   };
 
   const renderIngredientsList = () => {
@@ -105,8 +116,17 @@ export default function ProductResultScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.productHeader}>
           <Image 
-            source={{ uri: image || `https://api.a0.dev/assets/image?text=${encodeURIComponent(productName)}&aspect=4:3` }}
+            source={{ 
+              uri: imageError || !image 
+                ? `https://api.a0.dev/assets/image?text=${encodeURIComponent(productName || 'Product')}&aspect=4:3`
+                : image 
+            }}
             style={styles.productImage}
+            onError={() => {
+              console.log('Image load error, using fallback');
+              setImageError(true);
+            }}
+            resizeMode="cover"
           />
           
           <View style={[
@@ -128,7 +148,7 @@ export default function ProductResultScreen() {
         </View>
 
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>{productName}</Text>
+          <Text style={styles.productName}>{productName || 'Unknown Product'}</Text>
           {brand && <Text style={styles.productBrand}>{brand}</Text>}
           
           {allergensFound.length > 0 && (
@@ -163,7 +183,10 @@ export default function ProductResultScreen() {
               </TouchableOpacity>
             )}
             
-            <TouchableOpacity style={styles.alternativesButton}>
+            <TouchableOpacity 
+              style={styles.alternativesButton}
+              onPress={findAlternatives}
+            >
               <FontAwesome name="list-alt" size={18} color="#ffffff" />
               <Text style={styles.alternativesButtonText}>Find Safe Alternatives</Text>
             </TouchableOpacity>
@@ -179,6 +202,8 @@ export default function ProductResultScreen() {
           </View>
         </View>
       </ScrollView>
+      
+      <Toast />
     </SafeAreaView>
   );
 }
