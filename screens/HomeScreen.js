@@ -78,7 +78,7 @@ export default function HomeScreen() {
                 <ActionTile 
                   icon={<MaterialIcons name="chat" size={28} color={COLORS.white} />}
                   label="Consultations"
-                  onPress={() => navigateTo('ExpertHelp')}
+                  onPress={() => navigateTo('ExpertConsultation')}
                 />
                 <ActionTile 
                   icon={<FontAwesome name="search" size={24} color={COLORS.white} />}
@@ -88,7 +88,7 @@ export default function HomeScreen() {
                 <ActionTile 
                   icon={<MaterialIcons name="library-books" size={24} color={COLORS.white} />}
                   label="Resources"
-                  onPress={() => navigateTo('Resources')}
+                  onPress={() => navigateTo('ExpertResources')}
                 />
               </>
             ) : (
@@ -207,7 +207,7 @@ export default function HomeScreen() {
           <NavItem 
             icon={<MaterialIcons name="chat" size={24} color={COLORS.white} />}
             label="Consult"
-            onPress={() => navigateTo('ExpertHelp')}
+            onPress={() => navigateTo('ExpertConsultation')}
           />
         ) : (
           <NavItem 

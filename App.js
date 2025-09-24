@@ -24,6 +24,10 @@ import ForgotPasswordScreen from "./screens/ForgotPasswordScreen"
 import { auth, db } from './firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { AuthContext } from './contexts/AuthContext';
+import ExpertConsultationScreen from "./screens/ExpertConsultationScreen";
+import ExpertResourcesScreen from "./screens/ExpertResourcesScreen";
+import ExpertChatScreen from "./screens/ExpertChatScreen";
+
 
 const AuthStackNavigator = createNativeStackNavigator();
 const AppStackNavigator = createNativeStackNavigator();
@@ -63,7 +67,8 @@ function AppStack() {
   const [initialRoute, setInitialRoute] = React.useState('Home');
   const [routeChecked, setRouteChecked] = React.useState(false);
 
-  React.useEffect(() => {
+
+ React.useEffect(() => {
     const checkAllergyQAStatus = async () => {
       if (authContext?.userRole === 'user') {
         try {
@@ -93,10 +98,10 @@ function AppStack() {
     }
   }, [authContext?.isAuthenticated, authContext?.userRole]);
 
-  // Don't render until we've checked the route
   if (!routeChecked) {
     return null;
   }
+
 
   return (
     <AppStackNavigator.Navigator
@@ -116,6 +121,9 @@ function AppStack() {
       <AppStackNavigator.Screen name="ExpertHelp" component={ExpertHelpScreen} />
       <AppStackNavigator.Screen name="HelpSupport" component={HelpSupportScreen} />
       <AppStackNavigator.Screen name="ScanHistory" component={ScanHistoryScreen} />
+      <AppStackNavigator.Screen name="ExpertConsultation" component={ExpertConsultationScreen} />
+      <AppStackNavigator.Screen name="ExpertResources" component={ExpertResourcesScreen} />
+      <AppStackNavigator.Screen name="ExpertChat" component={ExpertChatScreen} />
     </AppStackNavigator.Navigator>
   );
 }
