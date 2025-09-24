@@ -93,7 +93,6 @@ const ForgotPasswordScreen = () => {
                           source={require('../assets/logo.png')}
                           style={styles.logo}
                         />
-            <Text style={styles.logoText}>AllergyGuard</Text>
           </View>
 
           <Text style={styles.titleText}>Reset Password</Text>
