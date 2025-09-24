@@ -105,7 +105,7 @@ export default function SearchProductScreen() {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <MaterialIcons name="search" size={20} color="#8e8e93" style={styles.searchIcon} />
+          <MaterialIcons name="search" size={20} color="#f3f3f9ff" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Enter product name or brand..."
@@ -127,7 +127,7 @@ export default function SearchProductScreen() {
           style={styles.searchButton} 
           onPress={handleSearch}
         >
-          <MaterialIcons name="search" size={20} color="#041c33ff" />
+          <MaterialIcons name="search" size={20} color="#f5f7f9ff" />
         </TouchableOpacity>
       </View>
 
