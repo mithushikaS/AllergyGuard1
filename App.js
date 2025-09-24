@@ -13,6 +13,7 @@ import ScanProductScreen from "./screens/ScanProductScreen"
 import SearchProductScreen from "./screens/SearchProductScreen"
 import ProductResultScreen from "./screens/ProductResultScreen"
 import MyAllergiesScreen from "./screens/MyAllergiesScreen"
+import AllergyQAScreen from "./screens/AllergyQAScreen"
 import ExpertHelpScreen from "./screens/ExpertHelpScreen"
 import HelpSupportScreen from "./screens/HelpSupportScreen"
 import ScanHistoryScreen from "./screens/ScanHistoryScreen"
@@ -58,9 +59,48 @@ function AuthStack() {
 }
 
 function AppStack() {
+  const authContext = React.useContext(AuthContext);
+  const [initialRoute, setInitialRoute] = React.useState('Home');
+  const [routeChecked, setRouteChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkAllergyQAStatus = async () => {
+      if (authContext?.userRole === 'user') {
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (!userData.allergyQACompleted) {
+                setInitialRoute('AllergyQA');
+              } else {
+                setInitialRoute('Home');
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error checking allergy QA status:', error);
+        }
+      } else if (authContext?.userRole === 'expert') {
+        setInitialRoute('Home');
+      }
+      setRouteChecked(true);
+    };
+
+    if (authContext?.isAuthenticated) {
+      checkAllergyQAStatus();
+    }
+  }, [authContext?.isAuthenticated, authContext?.userRole]);
+
+  // Don't render until we've checked the route
+  if (!routeChecked) {
+    return null;
+  }
+
   return (
     <AppStackNavigator.Navigator
-      initialRouteName="Home"
+      initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
         animation: 'none'
@@ -72,6 +112,7 @@ function AppStack() {
       <AppStackNavigator.Screen name="SearchProduct" component={SearchProductScreen} />
       <AppStackNavigator.Screen name="ProductResult" component={ProductResultScreen} />
       <AppStackNavigator.Screen name="MyAllergies" component={MyAllergiesScreen} />
+      <AppStackNavigator.Screen name="AllergyQA" component={AllergyQAScreen} />
       <AppStackNavigator.Screen name="ExpertHelp" component={ExpertHelpScreen} />
       <AppStackNavigator.Screen name="HelpSupport" component={HelpSupportScreen} />
       <AppStackNavigator.Screen name="ScanHistory" component={ScanHistoryScreen} />

@@ -44,40 +44,136 @@ const SignupScreen = () => {
     return emailRegex.test(email);
   };
 
-  const handleSignup = async () => {
-    if (!email.trim() || !password || !userType) {
+  const validateForm = () => {
+    if (!name.trim()) {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Please fill all fields including selecting a role'
+        text2: 'Please enter your full name'
       });
+      return false;
+    }
+
+    if (!email.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your email address'
+      });
+      return false;
+    }
+
+    if (!validateEmail(email)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a valid email address'
+      });
+      return false;
+    }
+
+    if (!password) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a password'
+      });
+      return false;
+    }
+
+    if (password.length < 6) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Password must be at least 6 characters long'
+      });
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Passwords do not match'
+      });
+      return false;
+    }
+
+    if (userType === 'expert' && !specialization.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your specialization'
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSignup = async () => {
+    if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
     try {
-      // Register user
+      // Register user with Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
+      const user = userCredential.user;
 
-      // Store user type in Firestore
-      await setDoc(doc(db, 'users', uid), {
-        email,
-        userType, // 'user' or 'expert'
-        createdAt: new Date()
+      // Update user profile with display name
+      await updateProfile(user, {
+        displayName: name
       });
+
+      // Store user data in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        userType,
+        specialization: userType === 'expert' ? specialization.trim() : '',
+        createdAt: new Date(),
+        allergies: [],
+        allergyQACompleted: false,
+        emailVerified: false
+      });
+
+      // Send email verification
+      try {
+        await sendEmailVerification(user);
+      } catch (emailError) {
+        console.log('Email verification error:', emailError);
+        // Continue even if email verification fails
+      }
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Signup successful!'
+        text1: 'Account Created!',
+        text2: userType === 'user' ? 'Please complete your allergy setup' : 'Welcome to AllergyGuard!'
       });
-      // Optionally, navigate or log in automatically
+
+      // Auto-login the user
+      login(userType);
+
+      // Navigation will be handled automatically by the AppStack based on allergyQACompleted status
+
     } catch (error) {
+      console.error('Signup error:', error);
+      let errorMessage = 'An error occurred during signup';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered. Please use a different email or try logging in.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      }
+
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error.message
+        text1: 'Signup Failed',
+        text2: errorMessage
       });
     } finally {
       setIsLoading(false);
@@ -97,26 +193,37 @@ const SignupScreen = () => {
     setIsLoading(true);
     try {
       const result = await signInWithGoogle();
-      const uid = result.user.uid;
+      const user = result.user;
 
-      // Store user type in Firestore
-      await setDoc(doc(db, 'users', uid), {
-        email: result.user.email,
+      // Store user data in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.displayName || 'Google User',
+        email: user.email,
         userType,
-        createdAt: new Date()
+        specialization: userType === 'expert' ? '' : '',
+        createdAt: new Date(),
+        allergies: [],
+        allergyQACompleted: false,
+        emailVerified: user.emailVerified
       });
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
+        text1: 'Account Created!',
         text2: 'Google signup successful!'
       });
-      // Navigate to appropriate screen
+
+      // Auto-login the user
+      login(userType);
+
+      // Navigation will be handled automatically by the AppStack based on allergyQACompleted status
+
     } catch (error) {
+      console.error('Google signup error:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error.message
+        text1: 'Signup Failed',
+        text2: 'Google signup failed. Please try again.'
       });
     } finally {
       setIsLoading(false);
@@ -312,7 +419,11 @@ const SignupScreen = () => {
               <View style={styles.separator} />
             </View>
 
-            <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignup}>
+            <TouchableOpacity 
+              style={[styles.socialButton, isLoading && styles.buttonDisabled]} 
+              onPress={handleGoogleSignup}
+              disabled={isLoading}
+            >
               <FontAwesome name="google" size={20} color="#DB4437" />
               <Text style={styles.socialButtonText}>Sign up with Google</Text>
             </TouchableOpacity>
