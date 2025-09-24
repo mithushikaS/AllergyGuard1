@@ -52,7 +52,7 @@ export default function HomeScreen() {
           <Image
             source={{ 
               uri: isExpert 
-                ? 'https://images.unsplash.com/photo-1576091160399-112ba8a25d32?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+                ? 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
                 : 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' 
             }}
             style={styles.heroImage}
