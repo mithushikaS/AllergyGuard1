@@ -5,7 +5,7 @@ import {
   useCameraPermissions,
 } from "expo-camera";
 import { useRef, useState } from "react";
-import { Button, Pressable, StyleSheet, Text, View, Modal, Platform } from "react-native";
+import { Button, Pressable, StyleSheet, Text, View, Modal, Platform, TextInput } from "react-native";
 import { Image } from "expo-image";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
@@ -32,6 +32,10 @@ export default function ScanProductScreen() {
   const [scanning, setScanning] = useState(false);
   const [imageCaptured, setImageCaptured] = useState(null);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
+  
+  // New state for controlling the title screen
+  const [showTitleScreen, setShowTitleScreen] = useState(true);
+  const [productTitle, setProductTitle] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -51,7 +55,115 @@ export default function ScanProductScreen() {
     navigation.goBack();
   };
 
-  if (!permission) {
+  const startScanning = () => {
+    setShowTitleScreen(false);
+  };
+
+  const analyzeManualProduct = () => {
+    if (!productTitle.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Product title required',
+        text2: 'Please enter a product title to continue',
+        position: 'bottom'
+      });
+      return;
+    }
+
+    setScanning(true);
+    
+    Toast.show({
+      type: 'info',
+      text1: 'Analyzing product...',
+      text2: `Searching for "${productTitle}"`,
+      position: 'bottom'
+    });
+
+    // Simulate API call for manual product search
+    setTimeout(() => {
+      setScanning(false);
+      
+      navigation.navigate('ProductResult', {
+        productName: productTitle,
+        brand: 'Generic Brand',
+        ingredients: [
+          'Wheat Flour', 
+          'Sugar', 
+          'Vegetable Oil', 
+          'Salt', 
+          'Baking Powder',
+          'Natural Flavoring'
+        ],
+        allergensFound: ['Wheat (Gluten)'],
+        isSafe: false,
+        image: null, // No image for manual entry
+        isManualEntry: true
+      });
+    }, 2000);
+  };
+
+  // Title Screen Component
+  const renderTitleScreen = () => {
+    return (
+      <SafeAreaView style={styles.titleContainer}>
+        <StatusBar style="light" />
+        
+        {/* Header */}
+        <View style={styles.titleHeader}>
+          <TouchableOpacity style={styles.backButton} onPress={goBack}>
+            <FontAwesome name="arrow-left" size={24} color="#000000ff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Scan Product</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        {/* Main Content */}
+        <View style={styles.titleContent}>
+          {/* Icon */}
+          <View style={styles.iconContainer}>
+            <MaterialIcons name="qr-code-scanner" size={80} color="#041c33ff" />
+          </View>
+
+          {/* Title and Description */}
+          <Text style={styles.mainTitle}>Add Product</Text>
+          <Text style={styles.subtitle}>
+            Enter product name manually or scan the product label to check for allergens
+          </Text>
+
+          {/* Manual Product Title Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>Product Title</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter product name (e.g., Chocolate Chip Cookies)"
+              placeholderTextColor="#64748B"
+              value={productTitle}
+              onChangeText={setProductTitle}
+              maxLength={100}
+            />
+          </View>
+
+          
+          {/* Start Button */}
+          <TouchableOpacity style={styles.startButton} onPress={startScanning}>
+            <Text style={styles.startButtonText}>Scan Product Label</Text>
+            <MaterialIcons name="qr-code-scanner" size={24} color="white" />
+          </TouchableOpacity>
+
+          {/* Upload Options */}
+          <TouchableOpacity 
+            style={styles.uploadOptionsButton} 
+            onPress={showUploadActionSheet}
+          >
+            <Ionicons name="cloud-upload" size={20} color="#1E3A8A" />
+            <Text style={styles.uploadOptionsText}>Or upload from gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  };
+
+  if (!permission && !showTitleScreen) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
@@ -79,7 +191,7 @@ export default function ScanProductScreen() {
     );
   }
 
-  if (!permission.granted) {
+  if (!permission?.granted && !showTitleScreen) {
     return (
       <View style={styles.container}>
         <Text style={{ textAlign: "center" }}>
@@ -95,7 +207,7 @@ export default function ScanProductScreen() {
       const photo = await ref.current?.takePictureAsync();
       if (photo?.uri) {
         setUri(photo.uri);
-        setImageCaptured(photo.uri); // Set the actual captured image
+        setImageCaptured(photo.uri);
         setScanning(true);
         
         setTimeout(() => {
@@ -129,7 +241,12 @@ export default function ScanProductScreen() {
         (buttonIndex) => {
           switch (buttonIndex) {
             case 1:
-              takePicture();
+              if (showTitleScreen) {
+                setShowTitleScreen(false);
+                setTimeout(() => takePicture(), 100);
+              } else {
+                takePicture();
+              }
               break;
             case 2:
               pickImageFromLibrary();
@@ -227,7 +344,7 @@ export default function ScanProductScreen() {
   const analyzeImage = (imageUri) => {
     setScanning(true);
     
-    console.log('Analyzing image with URI:', imageUri); // Debug log
+    console.log('Analyzing image with URI:', imageUri);
     
     Toast.show({
       type: 'info',
@@ -235,11 +352,9 @@ export default function ScanProductScreen() {
       position: 'bottom'
     });
 
-    // Simulate API call/analysis
     setTimeout(() => {
       setScanning(false);
       
-      // Navigate to result screen with the actual image URI
       navigation.navigate('ProductResult', {
         productName: 'Chocolate Chip Cookies',
         brand: 'Sweet Delights',
@@ -254,7 +369,7 @@ export default function ScanProductScreen() {
         ],
         allergensFound: ['Wheat (Gluten)', 'Eggs', 'Soy'],
         isSafe: false,
-        image: imageUri // Pass the actual image URI
+        image: imageUri
       });
     }, 2000);
   };
@@ -311,7 +426,7 @@ export default function ScanProductScreen() {
         />
         
         <View style={styles.controlsContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={goBack}>
+          <TouchableOpacity style={styles.backButton} onPress={() => setShowTitleScreen(true)}>
             <FontAwesome name="arrow-left" size={24} color="white" />
           </TouchableOpacity>
           
@@ -361,6 +476,82 @@ export default function ScanProductScreen() {
       </View>
     );
   };
+
+  // Show title screen first
+  if (showTitleScreen) {
+    return (
+      <View style={styles.container}>
+        {scanning && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#ffffff" />
+            <Text style={styles.loadingText}>Scanning Product...</Text>
+          </View>
+        )}
+        
+        {renderTitleScreen()}
+        
+        {/* Android Upload Options Modal */}
+        {Platform.OS === 'android' && (
+          <Modal
+            visible={showUploadOptions}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setShowUploadOptions(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Upload Options</Text>
+                
+                <TouchableOpacity 
+                  style={styles.optionButton}
+                  onPress={() => {
+                    setShowTitleScreen(false);
+                    setTimeout(() => takePicture(), 100);
+                  }}
+                >
+                  <Ionicons name="camera" size={24} color="#1E3A8A" />
+                  <Text style={styles.optionText}>Take Photo</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.optionButton}
+                  onPress={pickImageFromLibrary}
+                >
+                  <MaterialIcons name="photo-library" size={24} color="#1E3A8A" />
+                  <Text style={styles.optionText}>Choose from Gallery</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.optionButton}
+                  onPress={pickDocument}
+                >
+                  <MaterialIcons name="insert-drive-file" size={24} color="#1E3A8A" />
+                  <Text style={styles.optionText}>Upload File</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.optionButton}
+                  onPress={useSampleImage}
+                >
+                  <MaterialIcons name="collections" size={24} color="#1E3A8A" />
+                  <Text style={styles.optionText}>Use Sample Image</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.cancelButton}
+                  onPress={() => setShowUploadOptions(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        )}
+        
+        <Toast />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -440,6 +631,160 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  // Title Screen Styles
+  titleContainer: {
+    flex: 1,
+    backgroundColor: "#ffffffff",
+  },
+  titleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  titleContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  iconContainer: {
+    backgroundColor: 'rgba(97, 97, 100, 0.1)',
+    padding: 30,
+    borderRadius: 50,
+    marginBottom: 30,
+  },
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#041c33ff',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 30,
+  },
+  // Input Section Styles
+  inputSection: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 8,
+  },
+  textInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#ffffff',
+    marginBottom: 15,
+  },
+  analyzeButton: {
+    backgroundColor: '#3B82F6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    gap: 10,
+  },
+  analyzeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: '#041c33ff',
+    opacity: 0.6,
+  },
+  // Divider Styles
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 30,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  dividerText: {
+    color: '#94A3B8',
+    fontSize: 14,
+    fontWeight: '500',
+    paddingHorizontal: 20,
+  },
+  featuresList: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  featureText: {
+    fontSize: 16,
+    color: '#ffffff',
+    marginLeft: 15,
+    flex: 1,
+  },
+  startButton: {
+    backgroundColor: '#041c33ff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 12,
+    width: '100%',
+    marginBottom: 20,
+  },
+  startButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  uploadOptionsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#1E3A8A',
+    backgroundColor: 'rgba(30, 58, 138, 0.1)',
+  },
+  uploadOptionsText: {
+    color: '#1E3A8A',
+    fontSize: 16,
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  // Existing styles continue...
   camera: {
     flex: 1,
     width: "100%",
@@ -614,7 +959,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   analyzeButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#041c33ff',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

@@ -176,14 +176,6 @@ export default function HomeScreen() {
               />
             </Section>
 
-            <Section title="Emergency">
-              <FeatureCard 
-                icon={<MaterialIcons name="warning" size={28} color={COLORS.danger} />}
-                title="Allergic Reaction?"
-                description="Get emergency instructions"
-                onPress={() => navigateTo('Emergency')}
-              />
-            </Section>
           </>
         )}
       </ScrollView>
