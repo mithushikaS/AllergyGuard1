@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNav from './BottomNav';
 import Toast from 'react-native-toast-message';
 
 export default function ProductResultScreen() {
@@ -148,7 +149,7 @@ export default function ProductResultScreen() {
         </View>
 
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>{productName || 'Unknown Product'}</Text>
+          <Text style={styles.productName}>{productName || 'Chocolate Chip Cookies'}</Text>
           {brand && <Text style={styles.productBrand}>{brand}</Text>}
           
           {allergensFound.length > 0 && (
@@ -182,21 +183,12 @@ export default function ProductResultScreen() {
                 <Text style={styles.expertAdviceButtonText}>Get Expert Advice</Text>
               </TouchableOpacity>
             )}
-            
-            <TouchableOpacity 
-              style={styles.alternativesButton}
-              onPress={findAlternatives}
-            >
-              <FontAwesome name="list-alt" size={18} color="#ffffff" />
-              <Text style={styles.alternativesButtonText}>Find Safe Alternatives</Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.infoBox}>
             <Text style={styles.infoTitle}>About Allergen Detection</Text>
             <Text style={styles.infoText}>
-              Our system detects common allergens in ingredients lists. However, cross-contamination 
-              risks or manufacturing processes may not be fully reflected. Always consult a healthcare 
+              Our system detects common allergens in ingredients lists. Always consult a healthcare 
               professional if you have severe allergies.
             </Text>
           </View>
@@ -204,6 +196,7 @@ export default function ProductResultScreen() {
       </ScrollView>
       
       <Toast />
+      <BottomNav isExpert={false} navigateTo={navigation.navigate} />
     </SafeAreaView>
   );
 }

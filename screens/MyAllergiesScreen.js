@@ -6,6 +6,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import BottomNav from './BottomNav';
 
 const ALLERGY_CATEGORIES = [
   { id: '1', name: 'Nuts', icon: 'tree', color: '#F59E0B', iconFamily: 'FontAwesome' },
@@ -244,6 +245,7 @@ export default function MyAllergiesScreen() {
           </Text>
         </View>
       </ScrollView>
+       <BottomNav isExpert={false} navigateTo={navigation.navigate} />
     </SafeAreaView>
   );
 }
