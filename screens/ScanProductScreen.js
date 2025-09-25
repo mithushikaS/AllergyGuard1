@@ -87,6 +87,10 @@ export default function ScanProductScreen() {
 
     setTimeout(() => {
       setScanning(false);
+      // Clear the URI so camera view shows when returning
+      setUri(null);
+      setImageCaptured(null);
+      
       navigation.navigate('ProductResult', {
         productName: productTitle, // use entered product title
         brand: 'Scanned Brand',
@@ -128,6 +132,9 @@ export default function ScanProductScreen() {
         quality: 0.8,
       });
       if (!result.canceled && result.assets[0].uri) {
+        // Clear any existing URI before analyzing
+        setUri(null);
+        setImageCaptured(null);
         analyzeImage(result.assets[0].uri);
       }
     } catch (error) {
@@ -200,15 +207,30 @@ export default function ScanProductScreen() {
         mode={mode}
         facing={facing}
       />
+      
+      {/* Back button in top left */}
+      <TouchableOpacity 
+        style={styles.backButtonCamera}
+        onPress={goBack}
+      >
+        <FontAwesome name="arrow-left" size={24} color="white" />
+      </TouchableOpacity>
+      
+      {/* Upload button in top right */}
+      <TouchableOpacity 
+        style={styles.uploadButton}
+        onPress={pickImageFromLibrary}
+      >
+        <Ionicons name="cloud-upload" size={32} color="white" />
+      </TouchableOpacity>
+
+      {/* Camera shutter button in bottom center */}
       <View style={styles.shutterContainer}>
         <Pressable onPress={takePicture}>
           <View style={styles.shutterBtn}>
             <View style={[styles.shutterBtnInner, { backgroundColor: "white" }]} />
           </View>
         </Pressable>
-        <TouchableOpacity onPress={pickImageFromLibrary}>
-          <Ionicons name="cloud-upload" size={32} color="white" />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -256,19 +278,69 @@ const styles = StyleSheet.create({
   },
   startButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   camera: { flex: 1, width: "100%" },
+  
+  // Updated: Camera shutter button now centered at bottom
   shutterContainer: {
-    position: "absolute", bottom: 40, width: "100%",
-    flexDirection: "row", justifyContent: "space-around", alignItems: "center"
+    position: "absolute", 
+    bottom: 40, 
+    left: 0,
+    right: 0,
+    alignItems: "center", // Center horizontally
   },
   shutterBtn: {
-    borderWidth: 5, borderColor: "white", width: 85, height: 85, borderRadius: 45,
-    alignItems: "center", justifyContent: "center"
+    borderWidth: 5, 
+    borderColor: "white", 
+    width: 85, 
+    height: 85, 
+    borderRadius: 45,
+    alignItems: "center", 
+    justifyContent: "center"
   },
-  shutterBtnInner: { width: 70, height: 70, borderRadius: 50 },
+  shutterBtnInner: { 
+    width: 70, 
+    height: 70, 
+    borderRadius: 50 
+  },
+  
+  // New: Upload button positioned in top right
+  uploadButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // New: Back button positioned in top left
+  backButtonCamera: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center', alignItems: 'center'
+    ...StyleSheet.absoluteFillObject, 
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
-  loadingText: { color: 'white', marginTop: 10, fontSize: 18 },
-  previewImage: { flex: 1, width: "100%" }
+  loadingText: { 
+    color: 'white', 
+    marginTop: 10, 
+    fontSize: 18 
+  },
+  previewImage: { 
+    flex: 1, 
+    width: "100%" 
+  }
 });
